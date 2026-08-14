@@ -13,24 +13,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build App from SwiftPM
+      - name: Build Archive
         run: |
-          # Официальный метод сборки приложений из Swift Playgrounds / SwiftPM
-          xcodebuild build \
-            -package SpotBrief \
+          xcodebuild archive \
+            -project SpotBrief.xcodeproj \
             -scheme SpotBrief \
             -destination "generic/platform=iOS" \
-            -configuration Release \
+            -archivePath $RUNNER_TEMP/SpotBrief.xcarchive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            CONFIGURATION_BUILD_DIR=$RUNNER_TEMP/build
+            CODE_SIGN_IDENTITY=""
 
       - name: Package to IPA
         run: |
           mkdir -p Payload
-          # Находим скомпилированное приложение и упаковываем
-          cp -R $RUNNER_TEMP/build/SpotBrief.app Payload/
+          cp -R $RUNNER_TEMP/SpotBrief.xcarchive/Products/Applications/*.app Payload/
           zip -r SpotBrief.ipa Payload
 
       - name: Upload IPA
@@ -38,3 +35,4 @@ jobs:
         with:
           name: spotbrief-free-ipa
           path: SpotBrief.ipa
+
