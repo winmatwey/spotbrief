@@ -19,9 +19,6 @@ jobs:
       - name: Generate Xcode Project
         run: xcodegen generate
 
-      - name: Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode_16.app
-
       - name: Build App (No Sign)
         run: |
           xcodebuild build \
