@@ -13,28 +13,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate Xcode Project from SwiftPM
+      - name: Build Swift Playgrounds App
         run: |
-          # Встроенная команда Apple, которая превратит Package.swift в полноценный .xcodeproj
-          swift package generate-xcodeproj --output SpotBrief.xcodeproj
-
-      - name: Build App (No Sign)
-        run: |
+          # Собираем проект напрямую как Swift Package приложение
           xcodebuild build \
-            -project SpotBrief.xcodeproj \
-            -scheme SpotBrief-Package \
+            -clpPackage SpotBrief \
+            -scheme SpotBrief \
             -sdk iphoneos \
             -configuration Release \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=""
+            CODE_SIGN_IDENTITY="" \
+            DERIVED_DATA_PATH=$RUNNER_TEMP/DerivedData
 
       - name: Package to IPA
         run: |
           mkdir -p Payload
-          BUILD_DIR=~/Library/Developer/Xcode/DerivedData/SpotBrief-*/Build/Products/Release-iphoneos
-          # Находим скомпилированный .app файл внутри DerivedData
-          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "*.app" -type d | head -n 1)
+          # Ищем скомпилированное приложение .app внутри DerivedData
+          APP_PATH=$(find $RUNNER_TEMP/DerivedData -name "*.app" -type d | head -n 1)
           if [ -z "$APP_PATH" ]; then
             echo "Ошибка: Приложение .app не найдено!"
             exit 1
