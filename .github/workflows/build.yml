@@ -13,17 +13,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create Workspace for Swift Package
+      - name: Generate Xcode Project from SwiftPM
         run: |
-          # Создаем простую обертку, чтобы Xcode понял структуру как приложение
-          echo "import PackageDescription" > Package.swift
+          # Встроенная команда Apple, которая превратит Package.swift в полноценный .xcodeproj
+          swift package generate-xcodeproj --output SpotBrief.xcodeproj
 
-      - name: Build Archive
+      - name: Build App (No Sign)
         run: |
-          xcodebuild archive \
-            -scheme SpotBrief \
-            -destination "generic/platform=iOS" \
-            -archivePath $RUNNER_TEMP/SpotBrief.xcarchive \
+          xcodebuild build \
+            -project SpotBrief.xcodeproj \
+            -scheme SpotBrief-Package \
+            -sdk iphoneos \
+            -configuration Release \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""
@@ -31,8 +32,14 @@ jobs:
       - name: Package to IPA
         run: |
           mkdir -p Payload
-          # Копируем скомпилированное приложение из архива в папку Payload
-          cp -R $RUNNER_TEMP/SpotBrief.xcarchive/Products/Applications/*.app Payload/
+          BUILD_DIR=~/Library/Developer/Xcode/DerivedData/SpotBrief-*/Build/Products/Release-iphoneos
+          # Находим скомпилированный .app файл внутри DerivedData
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "*.app" -type d | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            echo "Ошибка: Приложение .app не найдено!"
+            exit 1
+          fi
+          cp -R "$APP_PATH" Payload/
           zip -r SpotBrief.ipa Payload
 
       - name: Upload IPA
