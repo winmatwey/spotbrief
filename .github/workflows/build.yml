@@ -13,31 +13,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build Swift Package
+      - name: Create Workspace for Swift Package
         run: |
-          xcodebuild build \
-            -clpPackage SpotBrief \
+          # Создаем простую обертку, чтобы Xcode понял структуру как приложение
+          echo "import PackageDescription" > Package.swift
+
+      - name: Build Archive
+        run: |
+          xcodebuild archive \
             -scheme SpotBrief \
-            -sdk iphoneos \
-            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath $RUNNER_TEMP/SpotBrief.xcarchive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            DSTROOT=$RUNNER_TEMP/build \
-            OBJROOT=$RUNNER_TEMP/obj \
-            SYMROOT=$RUNNER_TEMP/sym \
-            ONLY_ACTIVE_ARCH=NO
+            CODE_SIGN_IDENTITY=""
 
       - name: Package to IPA
         run: |
           mkdir -p Payload
-          # Находим скомпилированное приложение и копируем в Payload
-          APP_PATH=$(find $RUNNER_TEMP/sym -name "*.app" -type d | head -n 1)
-          if [ -z "$APP_PATH" ]; then
-            echo "Ошибка: Скомпилированное приложение .app не найдено!"
-            exit 1
-          fi
-          cp -R "$APP_PATH" Payload/
+          # Копируем скомпилированное приложение из архива в папку Payload
+          cp -R $RUNNER_TEMP/SpotBrief.xcarchive/Products/Applications/*.app Payload/
           zip -r SpotBrief.ipa Payload
 
       - name: Upload IPA
