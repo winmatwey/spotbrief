@@ -45,15 +45,15 @@ The two are independent, hand‑written implementations of the same product — 
 ### iOS
 1. Clone the repository:
    ```
-   git clone https://github.com/<your-username>/spotbrief.git
+   git clone https://github.com/winmatwey/spotbrief.git
    ```
-2. Open `SpotBrief 20.swiftpm` in Xcode or Swift Playgrounds.
+2. Open `SpotBrief.swiftpm` in Xcode or Swift Playgrounds.
 3. Build and run on a simulator or device running iOS 17 or later.
 
 ### Android
 1. Clone the repository:
    ```
-   git clone https://github.com/<your-username>/spotbrief.git
+   git clone https://github.com/winmatwey/spotbrief.git
    ```
 2. Open the `SpotBriefAndroid` folder in Android Studio and let it sync.
 3. If Gradle can't find your SDK, create a `local.properties` file in the project root with:
@@ -65,7 +65,7 @@ The two are independent, hand‑written implementations of the same product — 
 
 ## Project structure
 
-### iOS — `SpotBrief 20.swiftpm/`
+### iOS — `SpotBrief.swiftpm/`
 ```
 SpotBrief 20.swiftpm/
 ├── Package.swift
