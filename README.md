@@ -1,3 +1,4 @@
+![image](IMG_0157)
 # SpotBrief
 
 SpotBrief is a news aggregator built for **iOS** (SwiftUI / Swift Playgrounds) and **Android** (Kotlin / Jetpack Compose). It pulls headlines from RSS feeds, sorts them into categories, generates short on‑device summaries, and can read them aloud — all without calling any external AI service.
